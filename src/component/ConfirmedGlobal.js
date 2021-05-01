@@ -14,22 +14,20 @@ const ConfirmedGlobal = () => {
 
   useEffect(() => {
     var tempCountry = "";
+    var tempCol = "";
     csv(
       "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/12-31-2020.csv"
     )
       .then((data) => {
-        console.log(data);
-        setCovidData(data);
         tempCountry = new Set(data.map((d) => d.Country_Region));
         setCountry([...tempCountry]);
       })
       .catch((err) => console.log(err));
-    //     csv(
-    //       "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
-    //     )
-    //       .then((data) => console.log(data))
-    //       .catch((err) => console.log(err));
-    //
+    csv(
+      "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
+    )
+      .then((data) => (setCovidData(data), console.log()))
+      .catch((err) => console.log(err));
   }, []);
 
   const handleChange = (e) => {
@@ -38,6 +36,7 @@ const ConfirmedGlobal = () => {
 
   return (
     <div>
+      <h1>Global Data</h1>
       <select onChange={(e) => handleChange(e)}>
         {country &&
           country.map((countryName, index) => (

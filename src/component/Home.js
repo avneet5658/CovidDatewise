@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
-import { csv, index } from "d3";
+import { csv } from "d3";
 import { CChart } from "@coreui/react-chartjs";
 const Home = () => {
   const [covidData, setCovidData] = useState("");
@@ -43,7 +43,9 @@ const Home = () => {
     setFilteredCountry(tempData);
     setStateUpdate(initialState);
     setCovidUpdate({
-      provincedStates: tempData.map((data) => data.Province_State),
+      provincedStates: [
+        ...new Set(tempData.map((data) => data.Province_State)),
+      ],
       confirmedCases: tempData.map((data) => data.Confirmed),
       deaths: tempData.map((data) => data.Deaths),
       recovered: tempData.map((data) => data.Recovered),
@@ -64,6 +66,7 @@ const Home = () => {
 
   return (
     <div>
+      <h1>Daily Report Data 31/12/2020</h1>
       <select onChange={(e) => handleCountry(e)}>
         {country &&
           country.map((countryName, index) => (
