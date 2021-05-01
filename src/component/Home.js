@@ -6,21 +6,18 @@ const Home = () => {
   const [covidData, setCovidData] = useState("");
   const [country, setCountry] = useState("");
   const [filteredCountry, setFilteredCountry] = useState([]);
-  const [covidUpdate, setCovidUpdate] = useState({
+  const [filteredState, setFilteredState] = useState([]);
+  const initialState = {
+    subStates: [],
     provincedStates: [],
     confirmedCases: [],
     deaths: [],
-    recovered: [],
+    recovers: [],
     actives: [],
-  });
-  const initialState = {
-    provincedState: "",
-    confirmedCase: "",
-    death: "",
-    recover: "",
-    active: "",
   };
+  const [covidUpdate, setCovidUpdate] = useState(initialState);
   const [stateUpdate, setStateUpdate] = useState(initialState);
+  const [subStateUpdate, setSubStateUpdate] = useState(initialState);
 
   useEffect(() => {
     var tempCountry = "";
@@ -43,24 +40,47 @@ const Home = () => {
     setFilteredCountry(tempData);
     setStateUpdate(initialState);
     setCovidUpdate({
+      ...covidUpdate,
       provincedStates: [
         ...new Set(tempData.map((data) => data.Province_State)),
       ],
       confirmedCases: tempData.map((data) => data.Confirmed),
       deaths: tempData.map((data) => data.Deaths),
-      recovered: tempData.map((data) => data.Recovered),
+      recovers: tempData.map((data) => data.Recovered),
       actives: tempData.map((data) => data.Active),
     });
   };
   const handleProvincedStates = (e) => {
-    const index = covidUpdate.provincedStates.indexOf(e.target.value);
+    const stateSelected = e.target.value;
+    const index = covidUpdate.provincedStates.indexOf(stateSelected);
+    var tempState = filteredCountry.filter(
+      (data) => data.Province_State === stateSelected
+    );
+    setFilteredState(tempState);
 
     setStateUpdate({
-      provincedState: [e.target.value],
-      confirmedCase: covidUpdate.confirmedCases[index],
-      death: covidUpdate.deaths[index],
-      recover: covidUpdate.recovered[index],
-      active: covidUpdate.actives[index],
+      subStates: tempState.map((data) => data.Admin2),
+      provincedStates: [stateSelected],
+      confirmedCases: covidUpdate.confirmedCases[index],
+      deaths: covidUpdate.deaths[index],
+      recovers: covidUpdate.recovers[index],
+      actives: covidUpdate.actives[index],
+    });
+  };
+
+  const handleSubStates = (e) => {
+    const subStateSelected = e.target.value;
+    const tempSubState = filteredState.filter(
+      (data) => data.Admin2 === subStateSelected
+    );
+    console.log(tempSubState);
+    setSubStateUpdate({
+      subStates: subStateSelected,
+      provincedStates: tempSubState[0].Province_State,
+      confirmedCases: tempSubState[0].Confirmed,
+      deaths: tempSubState[0].Deaths,
+      recovers: tempSubState[0].Recovered,
+      actives: tempSubState[0].Active,
     });
   };
 
@@ -68,6 +88,7 @@ const Home = () => {
     <div>
       <h1>Daily Report Data 31/12/2020</h1>
       <select onChange={(e) => handleCountry(e)}>
+        <option>Select</option>
         {country &&
           country.map((countryName, index) => (
             <option key={index} value={countryName}>
@@ -81,6 +102,15 @@ const Home = () => {
           {covidUpdate.provincedStates.map((stateName, index) => (
             <option key={index} value={stateName}>
               {stateName}
+            </option>
+          ))}
+        </select>
+      )}
+      {stateUpdate.subStates.length > 1 && (
+        <select onChange={(e) => handleSubStates(e)}>
+          {stateUpdate.subStates.map((subStateName, index) => (
+            <option key={index} value={subStateName}>
+              {subStateName}
             </option>
           ))}
         </select>
@@ -99,8 +129,10 @@ const Home = () => {
 
                 // data: [...confirmedCases],
                 data:
-                  stateUpdate.provincedState.length > 0
-                    ? [stateUpdate.confirmedCase]
+                  subStateUpdate.provincedStates.length > 0
+                    ? [subStateUpdate.confirmedCases]
+                    : stateUpdate.provincedStates.length > 0
+                    ? [stateUpdate.confirmedCases]
                     : [...covidUpdate.confirmedCases],
               },
 
@@ -111,8 +143,10 @@ const Home = () => {
                 tooltipLabelColor: "rgba(255,99,132,1)",
                 // data: [...actives],
                 data:
-                  stateUpdate.provincedState.length > 0
-                    ? [stateUpdate.active]
+                  subStateUpdate.provincedStates.length > 0
+                    ? [subStateUpdate.actives]
+                    : stateUpdate.provincedStates.length > 0
+                    ? [stateUpdate.actives]
                     : [...covidUpdate.actives],
               },
               {
@@ -122,9 +156,11 @@ const Home = () => {
                 tooltipLabelColor: "rgba(255,99,132,1)",
                 // data: [...recovered],
                 data:
-                  stateUpdate.provincedState.length > 0
-                    ? [stateUpdate.recover]
-                    : [...covidUpdate.recovered],
+                  subStateUpdate.provincedStates.length > 0
+                    ? [subStateUpdate.recovers]
+                    : stateUpdate.provincedStates.length > 0
+                    ? [stateUpdate.recovers]
+                    : [...covidUpdate.recovers],
               },
               {
                 label: "Deaths",
@@ -133,8 +169,10 @@ const Home = () => {
                 tooltipLabelColor: "rgba(255,99,132,1)",
                 // data: [...deaths],
                 data:
-                  stateUpdate.provincedState.length > 0
-                    ? [stateUpdate.death]
+                  subStateUpdate.provincedStates.length > 0
+                    ? [subStateUpdate.deaths]
+                    : stateUpdate.provincedStates.length > 0
+                    ? [stateUpdate.deaths]
                     : [...covidUpdate.deaths],
               },
             ]}
@@ -145,8 +183,10 @@ const Home = () => {
               },
             }}
             labels={
-              stateUpdate.provincedState.length > 0
-                ? [stateUpdate.provincedState]
+              subStateUpdate.provincedStates.length > 0
+                ? [subStateUpdate.subStates]
+                : stateUpdate.provincedStates.length > 0
+                ? [stateUpdate.provincedStates]
                 : [...covidUpdate.provincedStates]
             }
           />
