@@ -1,27 +1,21 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
-import { csv } from "d3";
+import { csv, filter } from "d3";
 import { CChart } from "@coreui/react-chartjs";
 const ConfirmedGlobal = () => {
-  const [covidData, setCovidData] = useState("");
+  const [covidData, setCovidData] = useState([]);
   const [country, setCountry] = useState("");
-
-  const changeState = (tempData, state, setState) => {
-    let tempState = state;
-    tempState.push(tempData);
-    setState(tempState);
-  };
+  const [filteredCountry, setFilteredCountry] = useState("");
+  const [provincedState, setProvincedState] = useState([]);
+  const [dates, setDates] = useState([]);
+  const [filteredState, setFilteredState] = useState();
+  const [result, setResult] = useState({
+    date: "",
+    confirmedCases: "",
+  });
 
   useEffect(() => {
     var tempCountry = "";
-    // csv(
-    //   "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/12-31-2020.csv"
-    // )
-    //   .then((data) => {
-    //     tempCountry = new Set(data.map((d) => d.Country_Region));
-    //     setCountry([...tempCountry]);
-    //   })
-    //   .catch((err) => console.log(err));
     csv(
       "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
     )
@@ -37,9 +31,67 @@ const ConfirmedGlobal = () => {
   }, []);
 
   const handleChange = (e) => {
-    console.log(e);
+    let selectedCountry = e.target.value;
+    let tempFilter = [];
+    console.log(
+      covidData.filter((data) => data["Country/Region"] === selectedCountry)
+    );
+    tempFilter = covidData.filter(
+      (data) => data["Country/Region"] === selectedCountry
+    );
+    setFilteredCountry(tempFilter);
+    setDates(covidData.columns.slice(4, covidData.columns.length));
+    setProvincedState(tempFilter.map((data) => data["Province/State"]));
+    // if (tempFilter.length > 1) {
+    // } else {
+    //   for( const date in tempFilter[0]){
+
+    //   }
+    // }
+    // setFilteredCountry();
+    // console.log(e);
+  };
+  const handleDateChange = (e) => {
+    const selectedDate = e.target.value;
+
+    if (filteredCountry.length === 1) {
+      for (let d in filteredCountry[0]) {
+        if (d === selectedDate) {
+          setResult({
+            date: selectedDate,
+            confirmedCases: filteredCountry[0][d],
+          });
+          console.log(filteredCountry[0][d]);
+        }
+      }
+    } else {
+      for (let d in filteredState[0]) {
+        if (d === selectedDate) {
+          setResult({
+            date: selectedDate,
+            confirmedCases: filteredState[0][d],
+          });
+          console.log(filteredState[0][d]);
+        }
+      }
+    }
   };
 
+  const handleProvincedStateChange = (e) => {
+    // for (let x in filteredCountry) {
+    //   for (let d in x) {
+    //     if (d === selectedDate) {
+    //       console.log(filteredCountry[0][d]);
+    //     }
+    //   }
+    // }
+    const selectedProvincedState = e.target.value;
+    setFilteredState(
+      filteredCountry.filter(
+        (data) => data["Province/State"] === selectedProvincedState
+      )
+    );
+  };
   return (
     <div>
       <h1>Global Data</h1>
@@ -51,40 +103,44 @@ const ConfirmedGlobal = () => {
             </option>
           ))}
       </select>
-
-      <CChart
-        type="bar"
-        datasets={[
-          {
-            label: "Confirmed",
-            backgroundColor: "rgba(179,181,198,0.2)",
-            borderColor: "rgba(179,181,198,1)",
-            pointBackgroundColor: "rgba(179,181,198,1)",
-            pointBorderColor: "#fff",
-            pointHoverBackgroundColor: "#fff",
-            pointHoverBorderColor: "rgba(179,181,198,1)",
-            tooltipLabelColor: "rgba(179,181,198,1)",
-            data: [65, 59, 90, 81, 56, 55, 40],
-          },
-          {
-            label: "Deaths",
-            backgroundColor: "rgba(255,99,132,0.2)",
-            borderColor: "rgba(255,99,132,1)",
-            pointBackgroundColor: "rgba(255,99,132,1)",
-            pointBorderColor: "#fff",
-            pointHoverBackgroundColor: "#fff",
-            pointHoverBorderColor: "rgba(255,99,132,1)",
-            tooltipLabelColor: "rgba(255,99,132,1)",
-            data: [28, 48, 40, 19, 96, 27, 100],
-          },
-        ]}
-        options={{
-          aspectRatio: 1.5,
-          tooltips: {
-            enabled: true,
-          },
-        }}
-      />
+      {provincedState.length > 1 && (
+        <select onChange={(e) => handleProvincedStateChange(e)}>
+          {provincedState.map((stateName, index) => (
+            <option key={index} value={stateName}>
+              {stateName}
+            </option>
+          ))}
+        </select>
+      )}
+      {dates.length > 1 && (
+        <select onChange={(e) => handleDateChange(e)}>
+          {dates.map((currentDate, index) => (
+            <option key={index} value={currentDate}>
+              {currentDate}
+            </option>
+          ))}
+        </select>
+      )}
+      {filteredCountry && (
+        <CChart
+          type="bar"
+          datasets={[
+            {
+              label: "Confirmed Global",
+              backgroundColor: "red",
+              borderColor: "rgba(179,181,198,1)",
+              data: [result.confirmedCases],
+            },
+          ]}
+          options={{
+            aspectRatio: 1.5,
+            tooltips: {
+              enabled: true,
+            },
+          }}
+          labels={[result.date]}
+        />
+      )}
     </div>
   );
 };
