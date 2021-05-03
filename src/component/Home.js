@@ -18,6 +18,7 @@ const Home = () => {
   const [covidUpdate, setCovidUpdate] = useState(initialState);
   const [stateUpdate, setStateUpdate] = useState(initialState);
   const [subStateUpdate, setSubStateUpdate] = useState(initialState);
+  const [currentCountry, setCurrentCountry] = useState("");
 
   useEffect(() => {
     var tempCountry = "";
@@ -39,6 +40,9 @@ const Home = () => {
     );
     setFilteredCountry(tempData);
     setStateUpdate(initialState);
+    setSubStateUpdate(initialState);
+    setCurrentCountry(countrySelected);
+
     setCovidUpdate({
       ...covidUpdate,
       provincedStates: [
@@ -87,6 +91,7 @@ const Home = () => {
   return (
     <div>
       <h1>Daily Report Data 31/12/2020</h1>
+
       <select onChange={(e) => handleCountry(e)}>
         <option>Select</option>
         {country &&
@@ -115,8 +120,8 @@ const Home = () => {
           ))}
         </select>
       )}
-
-      <div style={{ width: "70%", height: "80%" }}>
+      {console.log(subStateUpdate.provincedStates)}
+      <div style={{ width: "70%", height: "40%" }}>
         {filteredCountry.length > 0 ? (
           <CChart
             type="bar"
@@ -186,8 +191,10 @@ const Home = () => {
               subStateUpdate.provincedStates.length > 0
                 ? [subStateUpdate.subStates]
                 : stateUpdate.provincedStates.length > 0
-                ? [stateUpdate.provincedStates]
-                : [...covidUpdate.provincedStates]
+                ? [...stateUpdate.provincedStates]
+                : covidUpdate.provincedStates.length > 1
+                ? [...covidUpdate.provincedStates]
+                : [currentCountry]
             }
           />
         ) : null}
