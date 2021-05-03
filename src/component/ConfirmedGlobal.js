@@ -123,34 +123,52 @@ const ConfirmedGlobal = () => {
   };
   return (
     <div>
-      <h1>Global Data</h1>
-      <select onChange={(e) => handleCountryChange(e)}>
-        {country &&
-          country.map((countryName, index) => (
-            <option key={index} value={countryName}>
-              {countryName}
-            </option>
-          ))}
-      </select>
-      {console.log(filteredCountry)}
-      {provincedState.length > 1 && (
-        <select onChange={(e) => handleProvincedStateChange(e)}>
-          {provincedState.map((stateName, index) => (
-            <option key={index} value={stateName}>
-              {stateName}
-            </option>
-          ))}
+      <h1 className="text-primary">Global Data</h1>
+      <div className="d-flex w-50">
+        <select
+          className="form-control"
+          onChange={(e) => handleCountryChange(e)}
+        >
+          <option>Select</option>
+          {country &&
+            country.map((countryName, index) => (
+              <option key={index} value={countryName}>
+                {countryName}
+              </option>
+            ))}
         </select>
-      )}
-      {dates.length > 1 && (
-        <select onChange={(e) => handleDateChange(e)}>
-          {dates.map((currentDate, index) => (
-            <option key={index} value={currentDate}>
-              {currentDate}
-            </option>
-          ))}
-        </select>
-      )}
+        &nbsp;
+        {console.log(filteredCountry)}
+        {provincedState.length > 1 && (
+          <select
+            className="form-control"
+            onChange={(e) => handleProvincedStateChange(e)}
+          >
+            <option>Select</option>
+            {provincedState.map((stateName, index) => (
+              <option key={index} value={stateName}>
+                {stateName}
+              </option>
+            ))}
+            &nbsp;
+          </select>
+        )}
+        &nbsp;
+        {dates.length > 1 && (
+          <select
+            className="form-control"
+            onChange={(e) => handleDateChange(e)}
+          >
+            {dates.map((currentDate, index) => (
+              <option key={index} value={currentDate}>
+                {currentDate}
+              </option>
+            ))}
+            &nbsp;
+          </select>
+        )}
+      </div>
+
       <div style={{ display: "flex" }}>
         {filteredCountry.date.length > 0 && (
           <div style={{ width: "50%" }}>

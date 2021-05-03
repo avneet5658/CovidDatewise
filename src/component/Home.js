@@ -90,114 +90,128 @@ const Home = () => {
 
   return (
     <div>
-      <h1>Daily Report Data 31/12/2020</h1>
+      <div className="d-flex">
+        <div className="w-25 mr-auto">
+          <h1 className="text-primary mb-3">Daily Report Data 31/12/2020</h1>
+          <select className="form-control" onChange={(e) => handleCountry(e)}>
+            <option>Select</option>
+            {country &&
+              country.map((countryName, index) => (
+                <option key={index} value={countryName}>
+                  {countryName}
+                </option>
+              ))}
+          </select>
+          <br />
+          {covidUpdate.provincedStates.length > 1 && (
+            <select
+              className="form-control"
+              onChange={(e) => handleProvincedStates(e)}
+            >
+              <option>Select</option>
+              {covidUpdate.provincedStates.map((stateName, index) => (
+                <option key={index} value={stateName}>
+                  {stateName}
+                </option>
+              ))}
+            </select>
+          )}
+          <br />
 
-      <select onChange={(e) => handleCountry(e)}>
-        <option>Select</option>
-        {country &&
-          country.map((countryName, index) => (
-            <option key={index} value={countryName}>
-              {countryName}
-            </option>
-          ))}
-      </select>
+          {stateUpdate.subStates.length > 1 && (
+            <select
+              className="form-control"
+              onChange={(e) => handleSubStates(e)}
+            >
+              <option>Select</option>
+              {stateUpdate.subStates.map((subStateName, index) => (
+                <option key={index} value={subStateName}>
+                  {subStateName}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
 
-      {covidUpdate.provincedStates.length > 1 && (
-        <select onChange={(e) => handleProvincedStates(e)}>
-          {covidUpdate.provincedStates.map((stateName, index) => (
-            <option key={index} value={stateName}>
-              {stateName}
-            </option>
-          ))}
-        </select>
-      )}
-      {stateUpdate.subStates.length > 1 && (
-        <select onChange={(e) => handleSubStates(e)}>
-          {stateUpdate.subStates.map((subStateName, index) => (
-            <option key={index} value={subStateName}>
-              {subStateName}
-            </option>
-          ))}
-        </select>
-      )}
-      {console.log(subStateUpdate.provincedStates)}
-      <div style={{ width: "70%", height: "40%" }}>
-        {filteredCountry.length > 0 ? (
-          <CChart
-            type="bar"
-            datasets={[
-              {
-                label: "Confirmed",
-                backgroundColor: "blue",
-                borderColor: "rgba(179,181,198,1)",
-                tooltipLabelColor: "rgba(179,181,198,1)",
+        {console.log(subStateUpdate.provincedStates)}
+        <div style={{ width: "60%" }}>
+          {filteredCountry.length > 0 ? (
+            <CChart
+              type="bar"
+              datasets={[
+                {
+                  label: "Confirmed",
+                  backgroundColor: "blue",
+                  borderColor: "rgba(179,181,198,1)",
+                  tooltipLabelColor: "rgba(179,181,198,1)",
 
-                // data: [...confirmedCases],
-                data:
-                  subStateUpdate.provincedStates.length > 0
-                    ? [subStateUpdate.confirmedCases]
-                    : stateUpdate.provincedStates.length > 0
-                    ? [stateUpdate.confirmedCases]
-                    : [...covidUpdate.confirmedCases],
-              },
+                  // data: [...confirmedCases],
+                  data:
+                    subStateUpdate.provincedStates.length > 0
+                      ? [subStateUpdate.confirmedCases]
+                      : stateUpdate.provincedStates.length > 0
+                      ? [stateUpdate.confirmedCases]
+                      : [...covidUpdate.confirmedCases],
+                },
 
-              {
-                label: "Actives",
-                backgroundColor: "yellow",
-                borderColor: "rgba(255,99,132,1)",
-                tooltipLabelColor: "rgba(255,99,132,1)",
-                // data: [...actives],
-                data:
-                  subStateUpdate.provincedStates.length > 0
-                    ? [subStateUpdate.actives]
-                    : stateUpdate.provincedStates.length > 0
-                    ? [stateUpdate.actives]
-                    : [...covidUpdate.actives],
-              },
-              {
-                label: "Recovered",
-                backgroundColor: "green",
-                borderColor: "rgba(255,99,132,1)",
-                tooltipLabelColor: "rgba(255,99,132,1)",
-                // data: [...recovered],
-                data:
-                  subStateUpdate.provincedStates.length > 0
-                    ? [subStateUpdate.recovers]
-                    : stateUpdate.provincedStates.length > 0
-                    ? [stateUpdate.recovers]
-                    : [...covidUpdate.recovers],
-              },
-              {
-                label: "Deaths",
-                backgroundColor: "red",
-                borderColor: "rgba(255,99,132,1)",
-                tooltipLabelColor: "rgba(255,99,132,1)",
-                // data: [...deaths],
-                data:
-                  subStateUpdate.provincedStates.length > 0
-                    ? [subStateUpdate.deaths]
-                    : stateUpdate.provincedStates.length > 0
-                    ? [stateUpdate.deaths]
-                    : [...covidUpdate.deaths],
-              },
-            ]}
-            options={{
-              aspectRatio: 1.5,
-              tooltips: {
-                enabled: true,
-              },
-            }}
-            labels={
-              subStateUpdate.provincedStates.length > 0
-                ? [subStateUpdate.subStates]
-                : stateUpdate.provincedStates.length > 0
-                ? [...stateUpdate.provincedStates]
-                : covidUpdate.provincedStates.length > 1
-                ? [...covidUpdate.provincedStates]
-                : [currentCountry]
-            }
-          />
-        ) : null}
+                {
+                  label: "Actives",
+                  backgroundColor: "yellow",
+                  borderColor: "rgba(255,99,132,1)",
+                  tooltipLabelColor: "rgba(255,99,132,1)",
+                  // data: [...actives],
+                  data:
+                    subStateUpdate.provincedStates.length > 0
+                      ? [subStateUpdate.actives]
+                      : stateUpdate.provincedStates.length > 0
+                      ? [stateUpdate.actives]
+                      : [...covidUpdate.actives],
+                },
+                {
+                  label: "Recovered",
+                  backgroundColor: "green",
+                  borderColor: "rgba(255,99,132,1)",
+                  tooltipLabelColor: "rgba(255,99,132,1)",
+                  // data: [...recovered],
+                  data:
+                    subStateUpdate.provincedStates.length > 0
+                      ? [subStateUpdate.recovers]
+                      : stateUpdate.provincedStates.length > 0
+                      ? [stateUpdate.recovers]
+                      : [...covidUpdate.recovers],
+                },
+                {
+                  label: "Deaths",
+                  backgroundColor: "red",
+                  borderColor: "rgba(255,99,132,1)",
+                  tooltipLabelColor: "rgba(255,99,132,1)",
+                  // data: [...deaths],
+                  data:
+                    subStateUpdate.provincedStates.length > 0
+                      ? [subStateUpdate.deaths]
+                      : stateUpdate.provincedStates.length > 0
+                      ? [stateUpdate.deaths]
+                      : [...covidUpdate.deaths],
+                },
+              ]}
+              options={{
+                aspectRatio: 1.5,
+                tooltips: {
+                  enabled: true,
+                },
+              }}
+              labels={
+                subStateUpdate.provincedStates.length > 0
+                  ? [subStateUpdate.subStates]
+                  : stateUpdate.provincedStates.length > 0
+                  ? [...stateUpdate.provincedStates]
+                  : covidUpdate.provincedStates.length > 1
+                  ? [...covidUpdate.provincedStates]
+                  : [currentCountry]
+              }
+            />
+          ) : null}
+        </div>
       </div>
     </div>
   );
