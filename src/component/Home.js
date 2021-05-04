@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { useEffect } from "react";
 import { csv } from "d3";
 import { CChart } from "@coreui/react-chartjs";
+import moment from "moment";
 const Home = () => {
+  const [date, setDate] = useState("05-02-2021");
   const [covidData, setCovidData] = useState("");
   const [country, setCountry] = useState("");
   const [filteredCountry, setFilteredCountry] = useState([]);
@@ -23,7 +25,7 @@ const Home = () => {
   useEffect(() => {
     var tempCountry = "";
     csv(
-      "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/12-31-2020.csv"
+      `https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/${date}.csv`
     )
       .then((data) => {
         setCovidData(data);
@@ -31,7 +33,7 @@ const Home = () => {
         setCountry([...tempCountry]);
       })
       .catch((err) => console.log(err));
-  }, []);
+  }, [date]);
 
   const handleCountry = (e) => {
     let countrySelected = e.target.value;
@@ -92,7 +94,18 @@ const Home = () => {
     <div>
       <div className="d-flex">
         <div className="w-25 mr-auto">
-          <h1 className="text-primary mb-3">Daily Report Data 31/12/2020</h1>
+          <h1 className="text-primary mb-3">Daily Report Data {date}</h1>
+          <input
+            type="date"
+            className="form-control"
+            onChange={(e) => (
+              setFilteredCountry([]),
+              setDate(moment(e.target.value).format("MM-DD-YYYY"))
+            )}
+            min="2020-01-22"
+            max="2021-05-04"
+          />
+          <br />
           <select className="form-control" onChange={(e) => handleCountry(e)}>
             <option>Select</option>
             {country &&
