@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useEffect } from "react";
 import { csv } from "d3";
 import { CChart } from "@coreui/react-chartjs";
@@ -9,14 +9,17 @@ const Home = () => {
   const [country, setCountry] = useState("");
   const [filteredCountry, setFilteredCountry] = useState([]);
   const [filteredState, setFilteredState] = useState([]);
-  const initialState = {
-    subStates: [],
-    provincedStates: [],
-    confirmedCases: [],
-    deaths: [],
-    recovers: [],
-    actives: [],
-  };
+  const initialState = useMemo(
+    () => ({
+      subStates: [],
+      provincedStates: [],
+      confirmedCases: [],
+      deaths: [],
+      recovers: [],
+      actives: [],
+    }),
+    []
+  );
   const [covidUpdate, setCovidUpdate] = useState(initialState);
   const [stateUpdate, setStateUpdate] = useState(initialState);
   const [subStateUpdate, setSubStateUpdate] = useState(initialState);
@@ -24,16 +27,19 @@ const Home = () => {
 
   useEffect(() => {
     var tempCountry = "";
+    setCountry("");
+    setCovidUpdate(initialState);
     csv(
       `https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/${date}.csv`
     )
       .then((data) => {
+        console.log(data);
         setCovidData(data);
         tempCountry = new Set(data.map((d) => d.Country_Region));
         setCountry([...tempCountry]);
       })
       .catch((err) => console.log(err));
-  }, [date]);
+  }, [date, initialState]);
 
   const handleCountry = (e) => {
     let countrySelected = e.target.value;
@@ -79,7 +85,6 @@ const Home = () => {
     const tempSubState = filteredState.filter(
       (data) => data.Admin2 === subStateSelected
     );
-    console.log(tempSubState);
     setSubStateUpdate({
       subStates: subStateSelected,
       provincedStates: tempSubState[0].Province_State,
@@ -92,16 +97,16 @@ const Home = () => {
 
   return (
     <div>
-      <div className="d-flex">
-        <div className="w-25 mr-auto">
+      <div className="row">
+        <div className="col-md-4 col-sm-12">
           <h1 className="text-primary mb-3">Daily Report Data {date}</h1>
           <input
             type="date"
             className="form-control"
-            onChange={(e) => (
-              setFilteredCountry([]),
-              setDate(moment(e.target.value).format("MM-DD-YYYY"))
-            )}
+            onChange={(e) => {
+              setFilteredCountry([]);
+              setDate(moment(e.target.value).format("MM-DD-YYYY"));
+            }}
             min="2020-01-22"
             max="2021-05-04"
           />
@@ -145,85 +150,84 @@ const Home = () => {
             </select>
           )}
         </div>
+        <div className="col-md-8 col-sm-12">
+          <div className="col-md-p-5 col-sm-p-2">
+            {filteredCountry.length > 0 ? (
+              <CChart
+                type="bar"
+                datasets={[
+                  {
+                    label: "Confirmed",
+                    backgroundColor: "blue",
+                    borderColor: "rgba(179,181,198,1)",
+                    tooltipLabelColor: "rgba(179,181,198,1)",
 
-        {console.log(subStateUpdate.provincedStates)}
-        <div style={{ width: "60%" }}>
-          {filteredCountry.length > 0 ? (
-            <CChart
-              type="bar"
-              datasets={[
-                {
-                  label: "Confirmed",
-                  backgroundColor: "blue",
-                  borderColor: "rgba(179,181,198,1)",
-                  tooltipLabelColor: "rgba(179,181,198,1)",
-
-                  // data: [...confirmedCases],
-                  data:
-                    subStateUpdate.provincedStates.length > 0
-                      ? [subStateUpdate.confirmedCases]
-                      : stateUpdate.provincedStates.length > 0
-                      ? [stateUpdate.confirmedCases]
-                      : [...covidUpdate.confirmedCases],
-                },
-
-                {
-                  label: "Actives",
-                  backgroundColor: "yellow",
-                  borderColor: "rgba(255,99,132,1)",
-                  tooltipLabelColor: "rgba(255,99,132,1)",
-                  // data: [...actives],
-                  data:
-                    subStateUpdate.provincedStates.length > 0
-                      ? [subStateUpdate.actives]
-                      : stateUpdate.provincedStates.length > 0
-                      ? [stateUpdate.actives]
-                      : [...covidUpdate.actives],
-                },
-                {
-                  label: "Recovered",
-                  backgroundColor: "green",
-                  borderColor: "rgba(255,99,132,1)",
-                  tooltipLabelColor: "rgba(255,99,132,1)",
-                  // data: [...recovered],
-                  data:
-                    subStateUpdate.provincedStates.length > 0
-                      ? [subStateUpdate.recovers]
-                      : stateUpdate.provincedStates.length > 0
-                      ? [stateUpdate.recovers]
-                      : [...covidUpdate.recovers],
-                },
-                {
-                  label: "Deaths",
-                  backgroundColor: "red",
-                  borderColor: "rgba(255,99,132,1)",
-                  tooltipLabelColor: "rgba(255,99,132,1)",
-                  // data: [...deaths],
-                  data:
-                    subStateUpdate.provincedStates.length > 0
-                      ? [subStateUpdate.deaths]
-                      : stateUpdate.provincedStates.length > 0
-                      ? [stateUpdate.deaths]
-                      : [...covidUpdate.deaths],
-                },
-              ]}
-              options={{
-                aspectRatio: 1.5,
-                tooltips: {
-                  enabled: true,
-                },
-              }}
-              labels={
-                subStateUpdate.provincedStates.length > 0
-                  ? [subStateUpdate.subStates]
-                  : stateUpdate.provincedStates.length > 0
-                  ? [...stateUpdate.provincedStates]
-                  : covidUpdate.provincedStates.length > 1
-                  ? [...covidUpdate.provincedStates]
-                  : [currentCountry]
-              }
-            />
-          ) : null}
+                    // data: [...confirmedCases],
+                    data:
+                      subStateUpdate.provincedStates.length > 0
+                        ? [subStateUpdate.confirmedCases]
+                        : stateUpdate.provincedStates.length > 0
+                        ? [stateUpdate.confirmedCases]
+                        : [...covidUpdate.confirmedCases],
+                  },
+                  {
+                    label: "Actives",
+                    backgroundColor: "yellow",
+                    borderColor: "rgba(255,99,132,1)",
+                    tooltipLabelColor: "rgba(255,99,132,1)",
+                    // data: [...actives],
+                    data:
+                      subStateUpdate.provincedStates.length > 0
+                        ? [subStateUpdate.actives]
+                        : stateUpdate.provincedStates.length > 0
+                        ? [stateUpdate.actives]
+                        : [...covidUpdate.actives],
+                  },
+                  {
+                    label: "Recovered",
+                    backgroundColor: "green",
+                    borderColor: "rgba(255,99,132,1)",
+                    tooltipLabelColor: "rgba(255,99,132,1)",
+                    // data: [...recovered],
+                    data:
+                      subStateUpdate.provincedStates.length > 0
+                        ? [subStateUpdate.recovers]
+                        : stateUpdate.provincedStates.length > 0
+                        ? [stateUpdate.recovers]
+                        : [...covidUpdate.recovers],
+                  },
+                  {
+                    label: "Deaths",
+                    backgroundColor: "red",
+                    borderColor: "rgba(255,99,132,1)",
+                    tooltipLabelColor: "rgba(255,99,132,1)",
+                    // data: [...deaths],
+                    data:
+                      subStateUpdate.provincedStates.length > 0
+                        ? [subStateUpdate.deaths]
+                        : stateUpdate.provincedStates.length > 0
+                        ? [stateUpdate.deaths]
+                        : [...covidUpdate.deaths],
+                  },
+                ]}
+                options={{
+                  aspectRatio: 1.5,
+                  tooltips: {
+                    enabled: true,
+                  },
+                }}
+                labels={
+                  subStateUpdate.provincedStates.length > 0
+                    ? [subStateUpdate.subStates]
+                    : stateUpdate.provincedStates.length > 0
+                    ? [...stateUpdate.provincedStates]
+                    : covidUpdate.provincedStates.length > 1
+                    ? [...covidUpdate.provincedStates]
+                    : [currentCountry]
+                }
+              />
+            ) : null}
+          </div>
         </div>
       </div>
     </div>

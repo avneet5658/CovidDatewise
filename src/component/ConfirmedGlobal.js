@@ -7,6 +7,7 @@ const ConfirmedGlobal = () => {
     date: "",
     confirmedCases: "",
   };
+
   const [covidData, setCovidData] = useState([]);
   const [country, setCountry] = useState("");
   const [filteredCountry, setFilteredCountry] = useState(initialState);
@@ -14,17 +15,31 @@ const ConfirmedGlobal = () => {
   const [dates, setDates] = useState([]);
   const [filteredState, setFilteredState] = useState();
   const [result, setResult] = useState(initialState);
+
+  const [loc, setLoc] = useState({
+    lat: "",
+    lng: "",
+  });
   useEffect(() => {
     csv(
       "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
     )
-      .then(
-        (data) => (
-          setCovidData(data),
-          setCountry([...new Set(data.map((d) => d["Country/Region"]))])
-        )
-      )
+      .then((data) => {
+        setCovidData(data);
+        setCountry([...new Set(data.map((d) => d["Country/Region"]))]);
+      })
       .catch((err) => console.log(err));
+  }, []);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(function (position) {
+      console.log("Latitude is :", position.coords.latitude);
+      console.log("Longitude is :", position.coords.longitude);
+      setLoc({
+        lng: position.coords.longitude,
+        lat: position.coords.latitude,
+      });
+    });
   }, []);
 
   const handleCountryChange = (e) => {
@@ -35,8 +50,10 @@ const ConfirmedGlobal = () => {
     setResult(initialState);
     setProvincedState(tempFilter.map((data) => data["Province/State"]));
     console.log(tempFilter);
+
     let tempDates = [],
       tempConfirmedCase = [];
+
     if (tempFilter.length === 1) {
       setFilteredState(tempFilter);
       for (let data in tempFilter[0]) {
@@ -59,14 +76,6 @@ const ConfirmedGlobal = () => {
     });
 
     setDates(covidData.columns.slice(4, covidData.columns.length));
-    // if (tempFilter.length > 1) {
-    // } else {
-    //   for( const date in tempFilter[0]){
-
-    //   }
-    // }
-    // setFilteredCountry();
-    // console.log(e);
   };
   const handleDateChange = (e) => {
     const selectedDate = e.target.value;
@@ -81,16 +90,6 @@ const ConfirmedGlobal = () => {
           console.log(filteredState[0][d]);
         }
       }
-      // } else {
-      //   for (let d in filteredState[0]) {
-      //     if (d === selectedDate) {
-      //       setResult({
-      //         date: selectedDate,
-      //         confirmedCases: filteredState[0][d],
-      //       });
-      //       console.log(filteredState[0][d]);
-      //     }
-      //   }
     }
   };
 
@@ -124,54 +123,71 @@ const ConfirmedGlobal = () => {
   return (
     <div>
       <h1 className="text-primary">Global Data</h1>
-      <div className="d-flex w-50">
-        <select
-          className="form-control"
-          onChange={(e) => handleCountryChange(e)}
-        >
-          <option>Select</option>
-          {country &&
-            country.map((countryName, index) => (
-              <option key={index} value={countryName}>
-                {countryName}
-              </option>
-            ))}
-        </select>
+      <div className="row">
+        <div className="col-md-3">
+          <div className="p-2">
+            <select
+              className="form-control"
+              onChange={(e) => handleCountryChange(e)}
+            >
+              <option>Select</option>
+              {country &&
+                country.map((countryName, index) => (
+                  <option key={index} value={countryName}>
+                    {countryName}
+                  </option>
+                ))}
+            </select>
+            {loc.lat > 0 && (
+              <div>
+                <b>Latitude: {loc.lat}</b>
+                <br />
+                <b>Longitude:{loc.lng}</b>
+              </div>
+            )}
+          </div>
+        </div>
         &nbsp;
-        {console.log(filteredCountry)}
         {provincedState.length > 1 && (
-          <select
-            className="form-control"
-            onChange={(e) => handleProvincedStateChange(e)}
-          >
-            <option>Select</option>
-            {provincedState.map((stateName, index) => (
-              <option key={index} value={stateName}>
-                {stateName}
-              </option>
-            ))}
-            &nbsp;
-          </select>
+          <div className="col-md-3">
+            <div className="p-2">
+              <select
+                className="form-control"
+                onChange={(e) => handleProvincedStateChange(e)}
+              >
+                <option>Select</option>
+                {provincedState.map((stateName, index) => (
+                  <option key={index} value={stateName}>
+                    {stateName}
+                  </option>
+                ))}
+                &nbsp;
+              </select>
+            </div>
+          </div>
         )}
         &nbsp;
-        {dates.length > 1 && (
-          <select
-            className="form-control"
-            onChange={(e) => handleDateChange(e)}
-          >
-            {dates.map((currentDate, index) => (
-              <option key={index} value={currentDate}>
-                {currentDate}
-              </option>
-            ))}
-            &nbsp;
-          </select>
-        )}
+        <div className="col-md-3">
+          <div className="p-2">
+            {dates.length > 1 && (
+              <select
+                className="form-control"
+                onChange={(e) => handleDateChange(e)}
+              >
+                {dates.map((currentDate, index) => (
+                  <option key={index} value={currentDate}>
+                    {currentDate}
+                  </option>
+                ))}
+                &nbsp;
+              </select>
+            )}
+          </div>
+        </div>
       </div>
-
-      <div style={{ display: "flex" }}>
-        {filteredCountry.date.length > 0 && (
-          <div style={{ width: "50%" }}>
+      <div className="row p-2">
+        <div className="col-md-6 col-sm-12">
+          {filteredCountry.date.length > 0 && (
             <CChart
               type="line"
               datasets={[
@@ -190,10 +206,10 @@ const ConfirmedGlobal = () => {
               }}
               labels={[...filteredCountry.date]}
             />
-          </div>
-        )}
-        {result.date.length > 0 && (
-          <div style={{ width: "50%" }}>
+          )}
+        </div>
+        <div className="col-md-6 col-sm-12">
+          {result.date.length > 0 && (
             <CChart
               type="bar"
               datasets={[
@@ -201,7 +217,7 @@ const ConfirmedGlobal = () => {
                   label: "Confirmed Global",
                   backgroundColor: "red",
                   borderColor: "rgba(179,181,198,1)",
-                  data: [result.confirmedCases],
+                  data: [result.confirmedCases, 0],
                 },
               ]}
               options={{
@@ -210,10 +226,10 @@ const ConfirmedGlobal = () => {
                   enabled: true,
                 },
               }}
-              labels={[result.date]}
+              labels={[result.date, ""]}
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,0 +1,73 @@
+@font-face {
+  font-family: "navFont";
+  src: url("../fonts/Newsreader-Regular.ttf");
+}
+.navbackground {
+  background-color: #ab46bc;
+}
+.main-background {
+  background-color: antiquewhite;
+  max-width: 100%;
+}
+.row {
+  margin-left: 0px !important;
+}
+.navtitle {
+  font-family: navFont;
+  font-weight: bold;
+  color: white;
+  font-size: 30px;
+  letter-spacing: 2px;
+}
+.navlink {
+  font-family: navFont;
+  color: white;
+  letter-spacing: 3px;
+  font-size: 20px;
+}
+.main-head {
+  font-family: navFont;
+  text-align: center;
+  margin-top: 15%;
+  font-size: 500%;
+  font-weight: bold;
+}
+.hero-background {
+  background-color: #35ffd0;
+}
+.hero-image {
+  text-align: center;
+}
+.hero-heading {
+  font-family: navFont;
+  color: #ab46bc;
+  height: 67.2px;
+  padding: 10px 0px;
+}
+.nav-link:hover {
+  text-decoration: none;
+}
+.navlink:hover {
+  color: yellow;
+  transition: 0.7s;
+}
+.nav-dropdown {
+  display: none;
+}
+
+@media screen and (max-width: 992px) {
+  .main-head {
+    display: none;
+  }
+}
+@media screen and (max-width: 835px) {
+  .hero-heading {
+    height: auto;
+  }
+  .nav-horizontal {
+    display: none;
+  }
+  .nav-dropdown {
+    display: block;
+  }
+}
