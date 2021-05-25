@@ -50,12 +50,13 @@ const Home = () => {
     setStateUpdate(initialState);
     setSubStateUpdate(initialState);
     setCurrentCountry(countrySelected);
+    console.log(tempData);
 
     setCovidUpdate({
       ...covidUpdate,
       provincedStates: [
         ...new Set(tempData.map((data) => data.Province_State)),
-      ],
+      ].filter((data) => data !== "Unknown"),
       confirmedCases: tempData.map((data) => data.Confirmed),
       deaths: tempData.map((data) => data.Deaths),
       recovers: tempData.map((data) => data.Recovered),

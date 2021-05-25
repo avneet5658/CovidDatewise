@@ -32,25 +32,30 @@ const NavBar = () => {
               </Link>
             </div>
           </div>
-          <div className="btn-group dropleft nav-dropdown">
-            <button
-              className="btn btn-primary dropdown-toggle "
-              type="button"
-              id="dropdownMenuButton"
-              data-toggle="dropdown"
-            >
-              {/* <img src="menu.png" width="5%" height="5%" alt="menu" /> */}
-            </button>
-            <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <Link className="dropdown-item" to="/home">
-                Datewise
-              </Link>
-              <Link className="dropdown-item" to="/confirmedglobal">
-                Global
-              </Link>
-              <Link className="dropdown-item" to="/cowin">
-                Cowin
-              </Link>
+          <div className="nav-dropdown">
+            <div className="btn-group dropleft ">
+              <button
+                className="btn btn-primary dropdown-toggle "
+                type="button"
+                id="dropdownMenuButton"
+                data-toggle="dropdown"
+              >
+                {/* <img src="menu.png" width="5%" height="5%" alt="menu" /> */}
+              </button>
+              <div
+                className="dropdown-menu"
+                aria-labelledby="dropdownMenuButton"
+              >
+                <Link className="dropdown-item" to="/home">
+                  Datewise
+                </Link>
+                <Link className="dropdown-item" to="/confirmedglobal">
+                  Global
+                </Link>
+                <Link className="dropdown-item" to="/cowin">
+                  Cowin
+                </Link>
+              </div>
             </div>
           </div>
         </div>
